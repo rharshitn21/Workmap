@@ -32,7 +32,7 @@ router.route("/userdata/:id/:date").get((req, res)=>{
                     const temp_time = task.start_time;
                     task.start_time.setHours(0,0,0,0);
                     if(task.start_time.getTime() === data.date.getTime()) {
-                        chartData.tasks.push(temp_time);
+                        chartData.tasks.push(temp_time.getTime());
                         if(task.type === "Break")
                             chartData.filtered[0] += task.time_taken;
                         else if (task.type === "Meeting")
