@@ -29,11 +29,9 @@ router.route("/userdata/:id/:date").get((req, res)=>{
             if(err || !foundUser) res.send(chartData);
             else {
                 await foundUser.tasks.forEach((task)=>{
-                    console.log(task);
                     var temp_time = task.start_time;
                     temp_time.setHours(0,0,0,0);
                     if(temp_time.getTime() === data.date.getTime()) {
-                        console.log(task);
                         chartData.tasks.push(task);
                         if(task.type === "Break")
                             chartData.filtered[0] += task.time_taken;
@@ -48,7 +46,7 @@ router.route("/userdata/:id/:date").get((req, res)=>{
                     chartData.status = 200;
                     return chartData;
                 }
-                
+                console.log(chartData);
                 res.send(f());
             }
         })
