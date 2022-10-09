@@ -29,7 +29,7 @@ router.route("/userdata/:id/:date").get((req, res)=>{
             if(err || !foundUser) res.send(chartData);
             else {
                 await foundUser.tasks.forEach((task)=>{
-                    const temp_time = task.start_time;
+                    var temp_time = task.start_time;
                     task.start_time.setHours(0,0,0,0);
                     if(task.start_time.getTime() === data.date.getTime()) {
                         chartData.tasks.push(temp_time.getTime());
