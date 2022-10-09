@@ -1,6 +1,9 @@
 import express from 'express';
 import User from '../models/user.model.js';
 import Task from '../models/task.model.js';
+import bcrypt from 'bcrypt';
+import passport from 'passport';
+
 
 const router = express.Router();
 
@@ -43,14 +46,60 @@ router.route('/profile').get((req, res)=>{
                     department: foundUser.department,
                     doj: foundUser.doj,
                 }
-                res.render('user_profile', {userData: userData, status: 100});
+                res.render('user_profile', {userData: userData, prstatus: 100, pastatus: 100});
             }
         })
     }
 }).post((req, res)=>{
-
+    if(!req.user) return res.redirect('/login');
+    else {
+            User.findOneAndUpdate({username: req.user.username}, {
+                name: req.body.name,
+                contact: req.body.contact,
+                department: req.body.department,
+            }, (err, foundUser)=>{
+                const userData = {
+                    name: foundUser.name,
+                    contact: foundUser.contact,
+                    email: foundUser.email,
+                    department: foundUser.department,
+                    doj: foundUser.doj,
+                }
+                if(err ) res.render('user_profile', {userData: userData, prstatus: 400, pastatus: 100});
+                // update profile
+                res.render('user_profile', {userData: userData, prstatus: 200, pastatus: 100});
+            });
+    }
 })
 
+
+router.route("/changepasswd").post((req, res)=>{
+    if(!req.user) return res.redirect("/login");
+    else {
+        bcrypt.hash(req.body.password, 10, (err, hashedPassword)=>{
+            if(err) throw err;
+            else {
+                User.findOneAndUpdate({username: req.user.username}, {
+                    password: hashedPassword
+                }, (err, foundUser)=>{
+                    const userData = {
+                        name: foundUser.name,
+                        contact: foundUser.contact,
+                        email: foundUser.email,
+                        department: foundUser.department,
+                        doj: foundUser.doj,
+                    }
+                    if(err ) res.render('user_profile', {userData: userData, prstatus: 100, pastatus: 400});
+                    // update profile
+                    req.logOut((err)=>{
+                        if(err) throw err;
+                        return res.render('passwdChange_success');
+                    })
+                })
+            }
+        });
+    }
+})
 
 
 router.route('/dashboard').get((req, res)=>{

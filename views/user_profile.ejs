@@ -11,16 +11,16 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
                 <h1 class="h2">Profile</h1>
             </div>
-                <% if(status == 200) {%>
+                <% if(prstatus == 200) {%>
                     <div class="card bg-success" >
                         <div class="card-body">success</div>
                     </div>
-                <% } else if (status == 400) { %>
+                <% } else if (prstatus == 400) { %>
                     <div class="card text-light bg-danger">
-                        <div class="card-body">Failed, username already exists</div>
+                        <div class="card-body">Failed</div>
                     </div>
                 <% } else {}%>
-            <form method="POST" action="/user/profile">
+            <form id="myform" method="POST" action="/user/profile">
                 <div class="from-group">
                     <label for="name" ></label>
                     <input type="text" class="form-control" name="name" id="name" value="<%= userData.name %>" placeholder="Enter Name">
@@ -37,27 +37,90 @@
                     <label for="department" ></label>
                     <input type="text" class="form-control" name="department" id="department" value="<%= userData.department %>" placeholder="Enter Department">
                 </div>
-                <!-- <div class="from-group">
-                    <label for="doj" ></label>
-                    <input type="date" class="form-control" name="doj" id="doj" value="<%= userData.doj %>" placeholder="Enter DOJ">
-                </div> -->
-                <div class="from-group">
-                    <label for="password" ></label>
-                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter new password">
-                </div>
-                <div class="from-group">
-                    <label for="cpassword" ></label>
-                    <input type="password" class="form-control"  id="cpassword" placeholder="Confirm new password">
-                </div>
-                <div class="form-group">
-                    <button style="margin: 10px 0px 0px 0px" type="submit" class="btn btn-primary col-12">Update</button>
-                </div>
                 
+                <div class="form-group">
+                    <button style="margin: 10px 0px 0px 0px" id="update" type="submit" class="btn btn-primary col-12">Update</button>
+                </div>
             </form>
+
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+                <h1 class="h2">Change password</h1>
+            </div>
+                <% if(pastatus == 200) {%>
+                    <div class="card bg-success" >
+                        <div class="card-body">success</div>
+                    </div>
+                <% } else if (pastatus == 400) { %>
+                    <div class="card text-light bg-danger">
+                        <div class="card-body">Failed</div>
+                    </div>
+                <% } else {}%>
+
+                <form method="POST" action="/user/changepasswd">
+                    <div class="from-group">
+                        <label for="password" ></label>
+                        <input type="password" class="form-control" onkeyup="newpassword()" name="password" id="password" placeholder="Enter new password">
+                    </div>
+                    <div class="from-group">
+                        <label for="cpassword" ></label>
+                        <input type="password" class="form-control"  onkeyup="newpassword()" id="cpassword" placeholder="Confirm new password">
+                        <p id="password_warning" class="form-text text-muted"></p>
+                    </div>
+                    <div class="form-group">
+                        <button style="margin: 10px 0px 0px 0px" id="updateButton" type="submit" class="btn btn-primary col-12" disabled>Change Password</button>
+                    </div>
+                </form>
         </main>
     </div>
     
     
 </div>
+
+
+
+<script>
+    function newpassword() {
+        const password = document.getElementById("password").value;
+        const cpassword = document.getElementById("cpassword").value;
+        const w = "Passwords don't match";
+        if((cpassword === "" && password === "") || cpassword === password) {
+            document.getElementById('password_warning').innerText = "";
+            document.getElementById('updateButton').disabled = false;
+        } else {
+            document.getElementById('password_warning').innerText = w;
+            document.getElementById('updateButton').disabled = true;
+
+        }
+    }
+    // var form = document.getElementById("myform");
+    // form.addEventListener('submit', (e)=>{e.preventDefault();});
+
+    // async function profileUpdate() {
+    //     const updatedProfileF = () =>  ({
+    //         name : document.getElementById('name').value,
+    //         contact: document.getElementById('contact').value,
+    //         department: document.getElementById('department').value,
+    //         password: document.getElementById('password').value
+    //     });
+
+    //     const updatedProfile = await updatedProfileF();
+    //     console.log(updatedProfile);
+
+    //     const URL = "http://localhost:3000/user/profile";
+
+    //     const res = await fetch(URL, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': 'Bearer '+this.token,
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=utf-8'
+    //             },
+    //         body: JSON.stringify(updatedProfile)
+    //     });
+
+    //     console.log(res);
+    // }
+</script>
 
 <%- include("p_footer.ejs")-%>

@@ -88,7 +88,7 @@
                     <h1 class="h2">Dashboard</h1>
                 </div>
 
-                <div class="chart-container" style="">
+                <div class="chart-container">
                   <div class="row chart-container" style="height:300px">
                       <div class="col-sm chart-container" style="position: relative;height:200px;">
                           <canvas  id="piechart_presentday" height="200" width="200" ></canvas>
@@ -109,7 +109,6 @@
         async function getData() {
                 var info = await fetch(url);
                 info = await info.json();
-                console.log(info);
                 drawChart(info);
         }
         getData();
