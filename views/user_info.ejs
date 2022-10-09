@@ -5,10 +5,269 @@
 <div class="container-fluid">
     <div class="row">
         <%- include('admin_sidebar') -%>
-        
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            
+            <div class="chart-container">
+                <h1 class="h2" style="text-align:center;padding-top: 4%;"  id="Name"></h1>
+                <div class="flex-container">
+                    <div class="row container" style="width: 100%;padding-left:10%;padding-top:3%;padding-bottom: 10%;">
+                        <div class="col-sm-6 chart-container" >
+                            <canvas  style="background-color:black;width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_presentday" ></canvas>
+                        </div>
+                        <div class="col-sm-6 chart-container" >
+                            <canvas style="background-color:black;width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_previousday"  ></canvas>
+                        </div>
+                    </div>
+                    <div class="row chart-container" style="width: 100%;height:60%;padding-left:11%;padding-right:40%;padding-top: 4%;padding-bottom: 50%;">
+                        <canvas style="background-color:black" id="barchart_week"></canvas>
+                    </div>
+                </div>
+            </div>
+          </main>  
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    let url=window.location.href;
+    const uid=url.split("/").pop();  
+    axios.post("http://localhost:3000/graphinfo/userdata",{
+        id:uid,
+    }).then((response)=>{
+        // console.log(response.data);
+        drawChart(response.data);
+    });
+    // async function getData(){
+        
+    //     const response=await fetch('http://localhost:3000/graphinfo/userdata',
+    //      {
+    //     method: 'POST',
+    //     mode: 'cors', // this cannot be 'no-cors'
+    //     headers: {
+    //         'Accept': 'application/json',
+    //         'Content-Type': 'application/x-www-form-urlencoded',
+    //     },
+    //     body: JSON.stringify({
+    //         "id": uid,
+    //     }),
+    //     });
+    //     const info=await response.json();
+    //     console.log(info);
+    //     drawChart(info);
+    // }
+    // getData();
+    // url="http://localhost:3000/graphinfo/userdata";
+    // async function getData() {
+    //         const info = await fetch(url,{
+    //             method: "POST",
+    //             body: JSON.stringify(snd_obj),
+    //             headers : {
+    //                 "Content-Type": "application/json" 
+    //             }
+    //         });
+    //         const object = await info.json();
+    //         drawChart(object);
+    //         // return object;
+    // }
+    // getData();
+  //  console.log(getData().then((data)=>{
+  //     const object=data;
+  //     return object
+  //   }));
+   
+    function drawChart(data_info) {
+    //   console.log(data_info);
+        document.getElementById("Name").innerHTML=data_info.name;
+        
 
+        var count1=0,count2=0,count3=0;
+        var present_data = data_info.today;
+        var previous_data = data_info.yesterday;
+        // present_data=[10,10,10];
+        // previous_data=[10,10,10];
+        var week_data=[10,10,10];
+        console.log(present_data,previous_data,week_data);
+        for(var i=0;i<3;i++){
+            if( previous_data[i]==0){
+            count1+=1;
+            }
+            if (present_data[i]==0){
+            count2+=1;
+            }
+            if (week_data[i]==0){
+            count3+=1;
+            }
+        }
 
-
+        const labels = [
+                "Break",
+                "Meeting",
+                "Work"
+            ];
+            
+            const data1 = {
+                labels: labels,
+                datasets: [{
+                label: 'Previous_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: previous_data,
+                }]
+            };
+            const data2 = {
+                labels: labels,
+                datasets: [{
+                label: 'Present_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: present_data,
+                }]
+            };
+            const data3 = {
+                labels: labels,
+                datasets: [{
+                label: 'week_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: week_data,
+                }]
+            };
+            const config1= {
+                type: "pie",
+                data: data1,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
+                        text: 'Yesterday data',
+                        font:{
+                            weight:"Bold",
+                            color:"white",
+                        },
+                        position:"top",
+                      },
+                      legend: 
+                      {
+                       
+                        labels: {
+                            color:"white",
+                            font: {
+                                size: 10,
+                                color:"white",
+                            },
+                            
+                        },
+                      }
+                  }
+                }
+            };
+            const config2 = {
+                type: "pie",
+                data: data2,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
+                        text: 'today data',
+                        font:{
+                            weight:"Bold",
+                            color:"white",
+                        },
+                        position:"top",
+                      },
+                      legend: 
+                      {
+                        labels: {
+                            font: {
+                                size: 10,
+                                color:"white",
+                            }
+                        },
+                      }
+                  }
+                }
+            };
+            const config3 = {
+                type: "bar",
+                data: data3,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
+                        text: 'week data',
+                        font:{
+                            weight:"Bold",
+                            color:"white",
+                        },
+                        position:"top",
+                      },
+                      legend: 
+                      {
+                        labels: {
+                            font: {
+                                size: 10,
+                                color:"white",
+                            }
+                        },
+                      }
+                  }
+                }
+            };
+            const myChart1=document.getElementById('piechart_previousday');
+            const myChart2=document.getElementById("piechart_presentday");
+            const myChart3=document.getElementById("barchart_week");
+            //chart 1
+            if(count1!=3){
+              const my_Chart = new Chart( myChart1.getContext('2d'),config1);
+            }
+            else{
+              const context=myChart1.getContext('2d');
+              context.fillStyle = "white";
+              context.font = " bold 15px Serif";
+              context.fillText("OOPS! No data", (myChart1.width/2)-100 , (myChart1.height / 2) + 8);
+            }
+            //chart 2
+            if(count2!=3){
+              const my_Chart2=new Chart(myChart2.getContext('2d'),config2);
+            }
+            else{
+              const context=myChart2.getContext('2d');
+              context.fillStyle = "white";
+              context.font = "bold 18px Serif";
+              context.fillText("OOPS! No data",  100 , (myChart2.height / 2) + 8);
+            }
+            //chart 3
+            if(count3!=3){
+              const my_Chart3=new Chart(myChart3.getContext('2d'),config3);
+            }
+            else{
+              const context=myChart3.getContext('2d');
+              context.fillStyle = "white";
+              context.font = "bold 18px Serif";
+              context.fillText("OOPS! No data",  100 , (myChart3.height / 2) + 8);
+            } 
+           
+    }
+</script>
 <%- include('p_footer') -%>

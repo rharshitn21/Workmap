@@ -102,10 +102,23 @@ router.route("/changepasswd").post((req, res)=>{
 })
 
 
+
+router.route("/data/:id").get((req, res)=>{
+    if(!req.user || req.user.access === 'user') return res.redirect('/login');
+    else {
+        res.render('user_info');
+    }
+})  
+
+
+
+
+
+
 router.route('/dashboard').get((req, res)=>{
     if(!req.user) res.redirect('/login');
     else {
-         res.render('user_dashboard');
+        res.render('user_dashboard');
     } 
 })
 
