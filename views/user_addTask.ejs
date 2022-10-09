@@ -1,0 +1,53 @@
+<%- include("p_header.ejs")-%>
+
+
+<%- include('navbar') -%>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('user_sidebar') -%>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+                <h1 class="h2">Add Task</h1>
+            </div>
+                <% if(status == 200) { %>
+                    <div class="card bg-success" >
+                        <div class="card-body">success</div>
+                    </div>
+                <% } else if (status == 100) { %>
+                    <div class="card text-light bg-danger">
+                        <div class="card-body">Failed</div>
+                    </div>
+                <% } else {}%>
+            <form method="POST" action="/user/addtask">
+                <div class="from-group pb-2">
+                    <label for="task_description" ></label>
+                    <textarea class="form-control" name="description" id="task_description" placeholder="Enter description" style="resize: none" rows="7" required></textarea>
+                </div>
+                <div class="from-group mt-3">
+                    <select class="form-select" name="type" required>
+                        <!-- <option hidden disabled>Select Task Type</option> -->
+                        <option value="Break">Break</option >
+                        <option value="Meeting">Meeting</option>
+                        <option value="Work">Work</option>
+                    </select>
+                </div>
+                <div class="from-group">
+                    <label for="start_time" ></label>
+                    <input type="datetime-local" name="start_time" class="form-control" id="start_time" max="{new Date().toISOString().split('T')[0]}" required>
+                </div>
+                <div class="from-group">
+                    <label for="time_taken" ></label>
+                    <input type="number" class="form-control" name="time_taken" id="time_taken" placeholder="Enter Timetaken (in min)" required>
+                </div>
+                <div class="form-group">
+                    <button style="margin: 10px 0px 0px 0px" type="submit" class="btn btn-primary col-12">submit</button>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+    
+</div>
+
+<%- include("p_footer.ejs")-%>

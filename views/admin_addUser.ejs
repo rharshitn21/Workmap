@@ -1,0 +1,67 @@
+<%- include("p_header.ejs")-%>
+
+
+<%- include('navbar') -%>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('admin_sidebar') -%>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+                <h1 class="h2">Add User</h1>
+            </div>
+                <% if(status == 200) {%>
+                    <div class="card bg-success" >
+                        <div class="card-body">success</div>
+                    </div>
+                <% } else if (status == 100) { %>
+                    <div class="card text-light bg-danger">
+                        <div class="card-body">Failed, username already exists</div>
+                    </div>
+                <% } else {}%>
+            <form method="POST" action="/admin/addUser">
+                <div class="from-group">
+                    <label for="name" ></label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter Name">
+                </div>
+                <div class="from-group">
+                    <label for="email" ></label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter email">
+                </div>
+                <div class="from-group">
+                    <label for="contact" ></label>
+                    <input ype="text" name="contact" class="form-control" id="contact" pattern="[1-9]{1}[0-9]{9}" placeholder="Enter Contact No">
+                </div>
+                <div class="from-group">
+                    <label for="department" ></label>
+                    <input type="text" class="form-control" name="department" id="department" placeholder="Enter Department">
+                </div>
+                <div class="from-group">
+                    <label for="doj" ></label>
+                    <input type="date" class="form-control" name="doj" id="doj" placeholder="Enter DOJ">
+                </div>
+                <div class="from-group">
+                    <label for="password" ></label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                </div>
+                <div class="from-group mt-3">
+                    <select class="form-select" name="access" required>
+                        <option hidden disabled>Select Access</option>
+                        <option value="admin">admin</option >
+                        <option value="user">user</option>
+                        <!-- <option value="Work">Work</optio -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button style="margin: 10px 0px 0px 0px" type="submit" class="btn btn-primary col-12">Submit</button>
+                </div>
+
+            </form>
+        </main>
+    </div>
+    
+    
+</div>
+
+<%- include("p_footer.ejs")-%>
