@@ -9,14 +9,15 @@ import bodyParser from "body-parser";
 import User from './models/user.model.js';
 import Task from './models/task.model.js';
 
-
 const __dirname = path.resolve();
 const app = express();
 
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
 
-app.use(bodyParser.urlencoded({extended: true}));
+
+
+
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
@@ -42,23 +43,31 @@ import graphAPI from "./routes/graphAPI.js";
 
 mongoose.connect(process.env.MONGOURI);
 
+app.use(bodyParser.json()) ;
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', userAuth);
 
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
 
-app.route('/login').get((req, res)=>{
-    res.render('login');
+app.route("/").get((req, res)=>{
+    return res.redirect('/login');
 });
 
-app.use(function(req, res, next) 
-{ res.header("Access-Control-Allow-Origin", "*"); 
-res.header(
-    "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
-next(); });
- app.use(bodyParser.json()) ;
- app.use(bodyParser.urlencoded({ extended: true }));
+app.route('/login').get((req, res)=>{
+    res.render('login', {lerror: 100});
+});
+
+
+app.use(function(req, res, next) { 
+    res.header("Access-Control-Allow-Origin", "*"); 
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
+    next(); 
+});
+
+
+
 app.use('/graphinfo', graphAPI);
 
 

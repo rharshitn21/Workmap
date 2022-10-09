@@ -74,8 +74,17 @@
   </head>
 
   <body class="text-center">
-    <form class="form-signin" method="POST" action="/loginAuth">
+    <form class="form-signin" method="POST" action="/login">
       <h1 class="h3 mb-3 font-weight-normal">Workmap</h1>
+      <% if(lerror === 400){ %>
+        <div class="card bg-danger mb-2">
+          <div class="card-body text-light">Incorrect Username or Password !!</div>
+        </div>
+      <% } else if (lerror === 500) {%>
+        <div class="card bg-warning mb-2">
+          <div class="card-body text-light">Account Inactive, Contact Admin</div>
+        </div>
+      <% }%>
       <label for="inputEmail" class="sr-only" hidden>Email address</label>
       <input type="email" id="inputEmail" class="form-control" name="username" placeholder="Email address" required autofocus>
       <label for="inputPassword" class="sr-only" hidden>Password</label>

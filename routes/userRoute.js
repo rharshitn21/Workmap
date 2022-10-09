@@ -106,7 +106,8 @@ router.route("/changepasswd").post((req, res)=>{
 router.route("/data/:id").get((req, res)=>{
     if(!req.user || req.user.access === 'user') return res.redirect('/login');
     else {
-        res.render('user_info');
+        
+        res.render('user_info', {filter: true});
     }
 })  
 

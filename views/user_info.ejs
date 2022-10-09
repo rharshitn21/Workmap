@@ -6,20 +6,32 @@
     <div class="row">
         <%- include('admin_sidebar') -%>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2 " id="Name"></h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                  <span data-feather="calendar"></span>
+                  This week
+                </button> -->
+                <div class="form-check form-switch">
+                    <input class="form-check-input" onclick="switchtoggle()" type="checkbox" role="switch" id="flexSwitchCheck" />
+                    <label class="form-check-label" for="flexSwitchCheckDefault" id="labelInfo"></label>
+                  </div>
+              </div>
+              </div>
             <div class="chart-container">
-                <h1 class="h2" style="text-align:center;padding-top: 4%;"  id="Name"></h1>
+                
                 <div class="flex-container">
-                    <div class="row container" style="width: 100%;padding-left:10%;padding-top:3%;padding-bottom: 10%;">
+                    <div class="row container" style="width: 80%;padding-left:10%;padding-top:3%;padding-bottom:0%;">
                         <div class="col-sm-6 chart-container" >
-                            <canvas  style="background-color:black;width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_presentday" ></canvas>
+                          <canvas style="width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_previousday"  ></canvas>
                         </div>
                         <div class="col-sm-6 chart-container" >
-                            <canvas style="background-color:black;width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_previousday"  ></canvas>
-                        </div>
+                            <canvas  style="width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_presentday" ></canvas>
+                          </div>
                     </div>
                     <div class="row chart-container" style="width: 100%;height:60%;padding-left:11%;padding-right:40%;padding-top: 4%;padding-bottom: 50%;">
-                        <canvas style="background-color:black" id="barchart_week"></canvas>
+                        <canvas id="barchart_week"></canvas>
                     </div>
                 </div>
             </div>
@@ -29,56 +41,62 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
+
+    
     let url=window.location.href;
     const uid=url.split("/").pop();  
+
+
+    function getfiltereddata() {
+        // action="/graphinfo/filteradmin"
+        // id
+        const data = {
+            id: uid,
+            date: document.getElementById("datefilter").value
+        }
+        setTimeout(function(){
+            window.location.href = 'http://localhost:3000/graphinfo/filteradmin/'+uid+"/"+document.getElementById("datefilter").value;
+            }, 1);
+
+        
+        // get request to /graphinfo/filteradmin/:id/:date
+
+
+    }
+
+    async function switchtoggle() {
+       let response=await fetch("http://localhost:3000/admin/userToggle",{method:"POST",mode:"cors",body:JSON.stringify({id:uid}),headers:{"Content-Type":"application/json"}});
+       var obj=await response.json();
+       if(obj.status==200){
+            window.location.reload();
+       }
+    };
+    
+
+
+
+
+
+    
     axios.post("http://localhost:3000/graphinfo/userdata",{
         id:uid,
     }).then((response)=>{
-        // console.log(response.data);
+        console.log(response.data);
         drawChart(response.data);
     });
-    // async function getData(){
-        
-    //     const response=await fetch('http://localhost:3000/graphinfo/userdata',
-    //      {
-    //     method: 'POST',
-    //     mode: 'cors', // this cannot be 'no-cors'
-    //     headers: {
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/x-www-form-urlencoded',
-    //     },
-    //     body: JSON.stringify({
-    //         "id": uid,
-    //     }),
-    //     });
-    //     const info=await response.json();
-    //     console.log(info);
-    //     drawChart(info);
-    // }
-    // getData();
-    // url="http://localhost:3000/graphinfo/userdata";
-    // async function getData() {
-    //         const info = await fetch(url,{
-    //             method: "POST",
-    //             body: JSON.stringify(snd_obj),
-    //             headers : {
-    //                 "Content-Type": "application/json" 
-    //             }
-    //         });
-    //         const object = await info.json();
-    //         drawChart(object);
-    //         // return object;
-    // }
-    // getData();
-  //  console.log(getData().then((data)=>{
-  //     const object=data;
-  //     return object
-  //   }));
-   
+    
     function drawChart(data_info) {
     //   console.log(data_info);
         document.getElementById("Name").innerHTML=data_info.name;
         
+        if(data_info.active) {
+            document.getElementById('labelInfo').innerHTML = "(Toggle to make the user <em>Inactive</em>)";
+            document.getElementById('flexSwitchCheck').checked = true;
+        }
+        else {
+            document.getElementById('labelInfo').innerHTML = "(Toggle to make the user ACTIVE)";
+            document.getElementById('flexSwitchCheck').checked = false;
+        }
 
         var count1=0,count2=0,count3=0;
         var present_data = data_info.today;
@@ -131,18 +149,30 @@
                 data: present_data,
                 }]
             };
+            const ARRAY_LENGTH = 5
+            
+
+            const labels2 = ["week1","week2","week3","week4","week5"]
+
             const data3 = {
-                labels: labels,
-                datasets: [{
-                label: 'week_day_data',
-                backgroundColor: [
-                "rgb(255, 99, 132)",
-                "rgb(0, 0, 255)",
-                "rgb(255, 165, 0)"
-                ],
-                borderColor: 'rgb(255, 99, 132)',
-                data: week_data,
-                }]
+              labels: labels2,
+              datasets: [
+                {
+                  label: 'Break',
+                  data: Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(255, 99, 132)"
+                },
+                {
+                  label: 'Meeting',
+                  data: Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(0, 0, 255)"
+                },
+                {
+                  label: 'Work',
+                  data:Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(255, 165, 0)"
+                },
+              ]
             };
             const config1= {
                 type: "pie",
@@ -154,10 +184,10 @@
                       title: 
                       {
                         display:true,
-                        text: 'Yesterday data',
+                        color:"black",
+                        text: 'Yesterday',
                         font:{
                             weight:"Bold",
-                            color:"white",
                         },
                         position:"top",
                       },
@@ -165,10 +195,9 @@
                       {
                        
                         labels: {
-                            color:"white",
+                            
                             font: {
-                                size: 10,
-                                color:"white",
+                                size: 10
                             },
                             
                         },
@@ -186,10 +215,10 @@
                       title: 
                       {
                         display:true,
-                        text: 'today data',
+                        color:"black",
+                        text: 'today',
                         font:{
-                            weight:"Bold",
-                            color:"white",
+                            weight:"Bold"
                         },
                         position:"top",
                       },
@@ -197,8 +226,7 @@
                       {
                         labels: {
                             font: {
-                                size: 10,
-                                color:"white",
+                                size: 10
                             }
                         },
                       }
@@ -206,33 +234,26 @@
                 }
             };
             const config3 = {
-                type: "bar",
+                type: 'bar',
                 data: data3,
-                options:
-                {
-                  plugins: 
-                  {
-                      title: 
-                      {
-                        display:true,
-                        text: 'week data',
-                        font:{
-                            weight:"Bold",
-                            color:"white",
-                        },
-                        position:"top",
-                      },
-                      legend: 
-                      {
-                        labels: {
-                            font: {
-                                size: 10,
-                                color:"white",
-                            }
-                        },
-                      }
+                options: {
+                plugins: {
+                  title: {
+                    display: true,
+                    color:"black",
+                    text: 'Stacked-bar showing employees work division over past 5 weeks'
+                  },
+                },
+                responsive: true,
+                scales: {
+                  x: {
+                    stacked: true,
+                  },
+                  y: {
+                    stacked: true
                   }
                 }
+              }
             };
             const myChart1=document.getElementById('piechart_previousday');
             const myChart2=document.getElementById("piechart_presentday");
@@ -243,8 +264,8 @@
             }
             else{
               const context=myChart1.getContext('2d');
-              context.fillStyle = "white";
-              context.font = " bold 15px Serif";
+              context.fillStyle = "black";
+              context.font = " bold 18px Serif";
               context.fillText("OOPS! No data", (myChart1.width/2)-100 , (myChart1.height / 2) + 8);
             }
             //chart 2
@@ -253,20 +274,20 @@
             }
             else{
               const context=myChart2.getContext('2d');
-              context.fillStyle = "white";
+              context.fillStyle = "black";
               context.font = "bold 18px Serif";
               context.fillText("OOPS! No data",  100 , (myChart2.height / 2) + 8);
             }
             //chart 3
-            if(count3!=3){
-              const my_Chart3=new Chart(myChart3.getContext('2d'),config3);
-            }
-            else{
-              const context=myChart3.getContext('2d');
-              context.fillStyle = "white";
-              context.font = "bold 18px Serif";
-              context.fillText("OOPS! No data",  100 , (myChart3.height / 2) + 8);
-            } 
+            // if(count3!=3){
+                const my_Chart3=new Chart(myChart3.getContext('2d'),config3);
+            // }
+            // else{
+            //   const context=myChart3.getContext('2d');
+            //   context.fillStyle = "white";
+            //   context.font = "bold 18px Serif";
+            //   context.fillText("OOPS! No data",  100 , (myChart3.height / 2) + 8);
+            // } 
            
     }
 </script>

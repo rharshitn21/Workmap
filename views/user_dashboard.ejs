@@ -1,198 +1,229 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>User</title>
+<%- include('p_header') -%>
 
-    <link href="/docs/5.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-        <!-- Favicons -->
-    <!-- <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180"> -->
-    <!-- <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png"> -->
-    <!-- <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
-    <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
-    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
-    <meta name="theme-color" content="#712cf9">  -->
+<%- include('navbar') -%>
 
-
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-
-      .b-example-divider {
-        height: 3rem;
-        background-color: rgba(0, 0, 0, .1);
-        border: solid rgba(0, 0, 0, .15);
-        border-width: 1px 0;
-        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
-      }
-
-      .b-example-vr {
-        flex-shrink: 0;
-        width: 1.5rem;
-        height: 100vh;
-      }
-
-      .bi {
-        vertical-align: -.125em;
-        fill: currentColor;
-      }
-
-      .nav-scroller {
-        position: relative;
-        z-index: 2;
-        height: 2.75rem;
-        overflow-y: hidden;
-      }
-
-      .nav-scroller .nav {
-        display: flex;
-        flex-wrap: nowrap;
-        padding-bottom: 1rem;
-        margin-top: -1px;
-        overflow-x: auto;
-        text-align: center;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-      }
-    </style>
-
-    
-    <!-- Custom styles for this template -->
-    <link href="../public/dashboard.css" rel="stylesheet">
-  </head>
-  <body>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-  
-   
-    <%- include('navbar') -%>
-
-    <div class="container-fluid">
-        <div class="row">
-            <%- include('user_sidebar') -%>
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard</h1>
+<div class="container-fluid">
+    <div class="row">
+        <%- include('user_sidebar') -%>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            
+            <div class="chart-container">
+               <div class="flex-container">
+                    <div class="row container" style="width: 80%;padding-left:10%;padding-top:3%;padding-bottom:0%;">
+                        <div class="col-sm-6 chart-container" >
+                          <canvas style="width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_previousday"  ></canvas>
+                        </div>
+                        <div class="col-sm-6 chart-container" >
+                            <canvas  style="width: 100%;padding-top: 2%;padding-bottom: 2%;" id="piechart_presentday" ></canvas>
+                          </div>
+                    </div>
+                    <div class="row chart-container" style="width: 100%;height:60%;padding-left:11%;padding-right:40%;padding-top: 4%;padding-bottom: 50%;">
+                        <canvas id="barchart_week"></canvas>
+                    </div>
                 </div>
-
-                <div class="chart-container">
-                  <div class="row chart-container" style="height:300px">
-                      <div class="col-sm chart-container" style="position: relative;height:200px;">
-                          <canvas  id="piechart_presentday" height="200" width="200" ></canvas>
-                      </div>
-                      <div class="col-sm chart-container" style="position: relative;">
-                          <canvas id="piechart_previousday" height="200" width="200"></canvas>
-                      </div>
-                  </div>
-                  <div class="row chart-container" style="position:relative;">
-                      <canvas id="barchart_week" height="400" width="400"></canvas>
-                  </div>
-              </div>
-            </main>
-        </div>
+            </div>
+          </main>  
     </div>
-    <script>
-        let url="http://localhost:3000/graphinfo/piechartdata";
-        async function getData() {
-                var info = await fetch(url);
-                info = await info.json();
-                drawChart(info);
-        }
-        getData();
-        function drawChart(data_info) {
-            var count=0,count1=0;
-            let present_data = data_info.today;
-            let previous_data = data_info.yesterday;
-            for(var i=0;i<3;i++){
-                if( present_data[i]==0){
-                count+=1;
-                }
-                if (previous_data[i]==0){
-                count1+=1;
-                }
-            }
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+   
+    axios.get("http://localhost:3000/graphinfo/piechartdata").then((response)=>{
+        // console.log(response.data);
+        drawChart(response.data);
+    });
+    
+    function drawChart(data_info) {
+    //   console.log(data_info);
+        
+        
 
-            const labels = [
-                    "Break",
-                    "Meeting",
-                    "Work"
-                ];
-                
-                const data = {
-                    labels: labels,
-                    datasets: [{
-                    label: 'Previous_day_data',
-                    backgroundColor: [
-                    "rgb(255, 99, 132)",
-                    "rgb(0, 0, 255)",
-                    "rgb(255, 165, 0)"
-                    ],
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: present_data,
-                    }]
-                };
-                
-                const config = {
-                    type: "pie",
-                    data: data,
-                    options: {
-                    responsive:true,
-                    maintainAspectRatio:true,
-                    plugins: {
-                        title: 
-                        {
-                        display:true    ,
+        var count1=0,count2=0,count3=0;
+        var present_data = data_info.today;
+        var previous_data = data_info.yesterday;
+        console.log(present_data,previous_data);
+        for(var i=0;i<3;i++){
+            if( previous_data[i]==0){
+            count1+=1;
+            }
+            if (present_data[i]==0){
+            count2+=1;
+            }
+        }
+
+        const labels1 = [
+                "Break",
+                "Meeting",
+                "Work"
+            ];
+            
+            const data1 = {
+                labels: labels1,
+                datasets: [{
+                label: 'Previous_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: previous_data,
+                }]
+            };
+            const data2 = {
+                labels: labels1,
+                datasets: [{
+                label: 'Present_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: present_data,
+                }]
+            };
+            const ARRAY_LENGTH = 5
+            
+
+            const labels2 = ["week1","week2","week3","week4","week5"]
+
+            const data3 = {
+              labels: labels2,
+              datasets: [
+                {
+                  label: 'Break',
+                  data: Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(255, 99, 132)"
+                },
+                {
+                  label: 'Meeting',
+                  data: Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(0, 0, 255)"
+                },
+                {
+                  label: 'Work',
+                  data:Array.from(Array(ARRAY_LENGTH)).map(x=>Math.random()*10),
+                  backgroundColor: "rgb(255, 165, 0)"
+                },
+              ]
+            };
+            const config1= {
+                type: "pie",
+                data: data1,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
                         text: 'Yesterday',
+                        color:"black",
                         font:{
                             weight:"Bold",
-                        }
                         },
-                        legend: {
+                        position:"top",
+                      },
+                      legend: 
+                      {
+                       labels: {
+                            color:"black",
+                            font: {
+                                size: 10
+                            },
+                            
+                        },
+                      }
+                  }
+                }
+            };
+            const config2 = {
+                type: "pie",
+                data: data2,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
+                        color:"black",
+                        text: 'today',
+                        font:{
+                            weight:"Bold"
+                        },
+                        position:"top",
+                      },
+                      legend: 
+                      {
                         labels: {
-                            // This more specific font property overrides the global property
+                          color:"black",
                             font: {
                                 size: 10
                             }
                         },
-                    }
+                      }
+                  }
                 }
-                    }
-                };
-                //chart 1
-                if(count!==3){
-                const myChart1=document.getElementById('piechart_presentday').getContext('2d');
-                const my_Chart = new Chart( myChart1,config);
+            };
+            const config3 = {
+                type: 'bar',
+                data: data3,
+                options: {
+                plugins: {
+                  title: {
+                    color:"black",
+                    display: true,
+                    text: 'Stacked-bar showing employees work division over past 5 weeks'
+                  },
+                },
+                responsive: true,
+                scales: {
+                  x: {
+                    stacked: true,
+                  },
+                  y: {
+                    stacked: true
+                  }
                 }
-                //chart 2
-                if(count1!==3){
-                const myChart2=document.getElementById("piechart_previousday").getContext('2d');
-                data.datasets.label="Present_day_data";
-                data.datasets[0].data=previous_data;
-                config.options.plugins.title.text="Today";
-                const my_Chart2=new Chart(myChart2,config);
-                }
-                //chart 3
-                // const myChart3=document.getElementById("barchart_week");
-                // data.datasets[0].data=week_data
-                // const my_Chart3=new Chart(myChart3,config);
-        }
-       
-          
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
-
-  </body>
-</html>
+              }
+            };
+            const myChart1=document.getElementById('piechart_previousday');
+            const myChart2=document.getElementById("piechart_presentday");
+            const myChart3=document.getElementById("barchart_week");
+            //chart 1
+            if(count1!=3){
+              const my_Chart = new Chart( myChart1.getContext('2d'),config1);
+            }
+            else{
+              const context=myChart1.getContext('2d');
+              context.fillStyle = "black";
+              context.font = " bold 15px Serif";
+              context.fillText("OOPS! No data", (myChart1.width/2)-100 , (myChart1.height / 2) + 8);
+            }
+            //chart 2
+            if(count2!=3){
+              const my_Chart2=new Chart(myChart2.getContext('2d'),config2);
+            }
+            else{
+              const context=myChart2.getContext('2d');
+              context.fillStyle = "black";
+              context.font = "bold 18px Serif";
+              context.fillText("OOPS! No data",  100 , (myChart2.height / 2) + 8);
+            }
+            //chart 3
+            // if(count3!=3){
+              const my_Chart3=new Chart(myChart3.getContext('2d'),config3);
+            // }
+            // else{
+            //   const context=myChart3.getContext('2d');
+            //   context.fillStyle = "white";
+            //   context.font = "bold 18px Serif";
+            //   context.fillText("OOPS! No data",  100 , (myChart3.height / 2) + 8);
+            // } 
+           
+    }
+</script>
+<%- include('p_footer') -%>

@@ -84,7 +84,7 @@
         const password = document.getElementById("password").value;
         const cpassword = document.getElementById("cpassword").value;
         const w = "Passwords don't match";
-        if((cpassword === "" && password === "") || cpassword === password) {
+        if((cpassword !== "") && (password !== "") && (cpassword === password)) {
             document.getElementById('password_warning').innerText = "";
             document.getElementById('updateButton').disabled = false;
         } else {

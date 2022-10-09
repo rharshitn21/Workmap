@@ -7,11 +7,11 @@ import bcrypt from 'bcrypt';
 const router = express.Router();
 
 router.route("/admin/addUser").post((req, res)=>{
-    User.findOne({username: req.body.username}, (err, foundUser) =>{
+    User.findOne({username: req.body.email}, (err, foundUser) =>{
         if(err) throw err;
         if(foundUser) {
             // user already exists 
-            res.render('admin_addUser', {status: 400})
+            res.render('admin_addUser', {status: 400, filter: false})
         }
         else {
             bcrypt.hash(req.body.password, 10, (err, hashedPassword)=>{
@@ -29,7 +29,7 @@ router.route("/admin/addUser").post((req, res)=>{
 
                     else {
                         // redirect back to form saying that it was a success
-                        res.render('admin_addUser', {status: 200})
+                        res.render('admin_addUser', {status: 200, filter: false})
                     }
                 })
             })  
@@ -39,21 +39,25 @@ router.route("/admin/addUser").post((req, res)=>{
 });
 
 
-router.route("/loginAuth").post((req, res, next)=>{
+router.route("/login").post((req, res, next)=>{
     console.log(req.body);
     passport.authenticate('local', (err, user, info)=>{
         if(err) throw err;
         if(!user) {
             // Authentication failed
-            console.log("happens");
+            res.render('login', {lerror: 400});
         }
         else {
-            req.logIn(user, err=>{
-                if(err) throw err;
-                // successfully authenticated
-                console.log("successfully authenticated");
-                return res.redirect('/dashboard');
-            })
+            if(!user.active) res.render('login', {lerror: 500});
+            else {
+                req.logIn(user, err=>{
+                    if(err) throw err;
+                    // successfully authenticated
+                    console.log("successfully authenticated");
+                    return res.redirect('/dashboard');
+                })
+            }
+            
         }
     })(req, res, next);
 })

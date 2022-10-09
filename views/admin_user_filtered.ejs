@@ -1,0 +1,205 @@
+<%- include('p_header') -%>
+
+<%- include('navbar') -%>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('admin_sidebar') -%>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2 " id="Name"></h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                  <span data-feather="calendar"></span>
+                  This week
+                </button> -->
+                <div class="form-check form-switch">
+                    <input class="form-check-input" onclick="switchtoggle()" type="checkbox" role="switch" id="flexSwitchCheck" />
+                    <label class="form-check-label" for="flexSwitchCheckDefault" id="labelInfo"></label>
+                  </div>
+              </div>
+              </div>
+            <div class="chart-container">
+                
+                <div class="flex-container">
+                    <div class="row chart-container" style="width: 100%;height:60%;padding-left:30%;padding-right:30%;padding-top: 4%;padding-bottom:3%;">
+                        <canvas id="piechart"></canvas>
+                    </div>
+                    <div class="row container" style="width: 100%;height:60%;padding-left:15%;padding-right:10%;padding-top: 4%;padding-bottom:3%;">
+                        <table class="table table-bordered table-light table-striped" id="table">
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+          </main>  
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+
+    let url=window.location.href;
+    const list=url.split("/");
+    const date1=list.pop(); 
+    const uid=list.pop();
+    console.log(uid,date1);
+    axios.post("http://localhost:3000/graphinfo/userdata/"+uid+"/"+date1,{
+        date:date1,
+        id:uid,
+    }).then((response)=>{
+        console.log(response.data);
+        drawChart(response.data);
+    });
+
+    async function switchtoggle() {
+       let response=await fetch("http://localhost:3000/admin/userToggle",{method:"POST",mode:"cors",body:JSON.stringify({id:uid}),headers:{"Content-Type":"application/json"}});
+       var obj=await response.json();
+       if(obj.status==200){
+            window.location.reload();
+       }
+    };
+    
+
+
+
+
+    function getfiltereddata() {
+        // action="/graphinfo/filteradmin"
+        // id
+        const data = {
+            id: uid,
+            date: document.getElementById("datefilter").value
+        }
+        setTimeout(function(){
+            window.location.href = 'http://localhost:3000/graphinfo/filteradmin/'+uid+"/"+document.getElementById("datefilter").value;
+            }, 1);
+
+        
+        // get request to /graphinfo/filteradmin/:id/:date
+
+
+    }
+    
+    
+    
+    function drawChart(data_info) {
+    //   console.log(data_info);
+        document.getElementById("Name").innerHTML=data_info.name;
+        
+        if(data_info.active) {
+            document.getElementById('labelInfo').innerHTML = "(Toggle to make the user <em>Inactive</em>)";
+            document.getElementById('flexSwitchCheck').checked = true;
+        }
+        else {
+            document.getElementById('labelInfo').innerHTML = "(Toggle to make the user ACTIVE)";
+            document.getElementById('flexSwitchCheck').checked = false;
+        }
+
+        var count1=0;
+        var previous_data = data_info.filtered;
+        var tasks=data_info.tasks;
+        if(tasks.length>0)
+        {
+            var columns=Object.keys(tasks[0]);
+            var temp1=columns[1];
+            columns[1]=columns[5];
+            columns[5]=temp1;
+            console.log(tasks,columns);
+            var html="<thead class=\"thead-dark\">\n<tr>\n";
+            for(var i=2;i<columns.length-1;i++){
+                html+="<th>"+columns[i]+"</th>\n";
+            }
+            html+="</tr>\n</thead>\n<tbody>\n";
+            console.log(html);
+            for(var i=0;i<tasks.length;i++){
+                html+="<tr>\n";
+                var values=Object.values(tasks[i]);
+                var temp=values[1];
+                values[1]=values[5];
+                values[5]=temp;
+                for(var j=2;j<columns.length-1;j++){
+                    html+="<td>"+values[j]+"</td>\n";
+                }
+                html+="</tr>\n";
+            }
+            html+="</tbody>";
+            console.log(html);
+            document.getElementById("table").innerHTML=html;
+        }
+        console.log(previous_data);
+        for(var i=0;i<3;i++){
+            if( previous_data[i]==0){
+            count1+=1;
+            }
+         
+        }
+
+        const labels1 = [
+                "Break",
+                "Meeting",
+                "Work"
+            ];
+            
+            const data1 = {
+                labels: labels1,
+                datasets: [{
+                label: 'Previous_day_data',
+                backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 165, 0)"
+                ],
+                borderColor: 'rgb(255, 99, 132)',
+                data: previous_data,
+                }]
+            };
+           
+            const config1= {
+                type: "pie",
+                data: data1,
+                options:
+                {
+                  plugins: 
+                  {
+                      title: 
+                      {
+                        display:true,
+                        text:date1,
+                        color:"black",
+                        font:{
+                            weight:"Bold",
+                        },
+                        position:"top",
+                      },
+                      legend: 
+                      {
+                       labels: {
+                            color:"black",
+                            font: {
+                                size: 10
+                            },
+                            
+                        },
+                      }
+                  }
+                }
+            };
+            
+            const myChart1=document.getElementById('piechart');
+           console.log(count1);
+            //chart 1
+            if(count1!=3){
+              const my_Chart = new Chart( myChart1.getContext('2d'),config1);
+            }
+            else{
+              const context=myChart1.getContext('2d');
+              context.fillStyle = "black";
+              context.font = " bold 15px Serif";
+              context.fillText("OOPS! No data", (myChart1.width/2)-100 , (myChart1.height / 2) + 8);
+            }
+           
+           
+    }
+</script>
+<%- include('p_footer') -%>
