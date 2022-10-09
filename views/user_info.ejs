@@ -55,7 +55,7 @@
             date: document.getElementById("datefilter").value
         }
         setTimeout(function(){
-            window.location.href = 'http://localhost:3000/graphinfo/filteradmin/'+uid+"/"+document.getElementById("datefilter").value;
+            window.location.href = 'https://workmapv2.herokuapp.com/graphinfo/filteradmin/'+uid+"/"+document.getElementById("datefilter").value;
             }, 1);
 
         
@@ -65,7 +65,7 @@
     }
 
     async function switchtoggle() {
-       let response=await fetch("http://localhost:3000/admin/userToggle",{method:"POST",mode:"cors",body:JSON.stringify({id:uid}),headers:{"Content-Type":"application/json"}});
+       let response=await fetch("https://workmapv2.herokuapp.com/admin/userToggle",{method:"POST",mode:"cors",body:JSON.stringify({id:uid}),headers:{"Content-Type":"application/json"}});
        var obj=await response.json();
        if(obj.status==200){
             window.location.reload();
@@ -78,7 +78,7 @@
 
 
     
-    axios.post("http://localhost:3000/graphinfo/userdata",{
+    axios.post("https://workmapv2.herokuapp.com/graphinfo/userdata",{
         id:uid,
     }).then((response)=>{
         console.log(response.data);

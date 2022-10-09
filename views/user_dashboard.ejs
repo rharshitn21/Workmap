@@ -29,7 +29,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
    
-    axios.get("http://localhost:3000/graphinfo/piechartdata").then((response)=>{
+    axios.get("https://workmapv2.herokuapp.com/graphinfo/piechartdata").then((response)=>{
         // console.log(response.data);
         drawChart(response.data);
     });
