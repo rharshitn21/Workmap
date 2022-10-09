@@ -1,5 +1,9 @@
 <%- include("p_header.ejs")-%>
 
+<script>
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById("start_time").setAttribute('max', today);
+</script>
 
 <%- include('navbar') -%>
 
@@ -48,10 +52,7 @@
         </main>
     </div>
     
-    <script>
-        var today = new Date().toISOString().split('T')[0];
-        document.getElementById("start_time").setAttribute('max', today);
-    </script>
+    
 </div>
 
 <%- include("p_footer.ejs")-%>
