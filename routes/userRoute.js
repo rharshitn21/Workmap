@@ -57,7 +57,7 @@ router.route('/profile').get((req, res)=>{
                 name: req.body.name,
                 contact: req.body.contact,
                 department: req.body.department,
-            }, (err, foundUser)=>{
+            },{new: true} ,(err, foundUser)=>{
                 const userData = {
                     name: foundUser.name,
                     contact: foundUser.contact,
